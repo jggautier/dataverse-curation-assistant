@@ -1474,7 +1474,7 @@ def get_dataset_metadata_export(
 
 def save_dataset_export(
     directoryPath, downloadStatusFilePath, installationUrl, datasetPid, 
-    exportFormat, timeout, verify, excludeFiles, allVersions=False, 
+    exportFormat, timeout, verify, excludeFiles, version=':latest', 
     headers={}, apiKey=''):
 
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -1484,18 +1484,52 @@ def save_dataset_export(
             downloadStatusFile, delimiter=',', quotechar='"', 
             quoting=csv.QUOTE_MINIMAL)
 
-        if allVersions == False:
+        # If version is a number, get that version's metadata
+        if isinstance(version, int):
+            specificVersionMetadata = get_dataset_metadata_export(
+                installationUrl, datasetPid, exportFormat, 
+                timeout, verify=verify, excludeFiles=excludeFiles, 
+                returnOwners=False, version=version,
+                headers={}, apiKey=apiKey)
+
+            if 'ERROR' in specificVersionMetadata or specificVersionMetadata['data']['versionState'] == 'DEACCESSIONED':
+                # Add to CSV file that the dataset's metadata was not downloaded
+                writer.writerow([datasetPid, False])
+
+            elif 'ERROR' not in specificVersionMetadata:
+                datasetPidInJson = specificVersionMetadata['data']['datasetPersistentId']
+                persistentUrl = get_url_form_of_pid(datasetPidInJson, installationUrl)
+
+                # Get version number of specific version
+                versionState = specificVersionMetadata['data']['versionState']
+                if versionState == 'DRAFT':
+                    versionNumber = 'DRAFT'
+                elif versionState == 'RELEASED':
+                    majorVersionNumber = specificVersionMetadata['data']['versionNumber']
+                    minorVersionNumber = specificVersionMetadata['data']['versionMinorNumber']
+                    versionNumber = f'v{majorVersionNumber}.{minorVersionNumber}'
+
+                datasetPidForFileName = datasetPidInJson.replace(':', '_').replace('/', '_')
+
+                metadataFile = f'{datasetPidForFileName}_{versionNumber}.json'
+                with open(os.path.join(directoryPath, metadataFile), mode='w') as f:
+                    f.write(json.dumps(specificVersionMetadata, indent=4))
+
+                # Add to CSV file that the dataset's metadata was downloaded
+                writer.writerow([datasetPidInJson, True])
+
+        elif version == ':latest':
             latestVersionMetadata = get_dataset_metadata_export(
                 installationUrl, datasetPid, exportFormat, 
                 timeout, verify=verify, excludeFiles=excludeFiles, 
                 returnOwners=False, version=':latest',
                 headers={}, apiKey=apiKey)
 
-            if latestVersionMetadata == 'ERROR' or latestVersionMetadata['data']['versionState'] == 'DEACCESSIONED':
+            if 'ERROR' in latestVersionMetadata or latestVersionMetadata['data']['versionState'] == 'DEACCESSIONED':
                 # Add to CSV file that the dataset's metadata was not downloaded
                 writer.writerow([datasetPid, False]) 
 
-            elif latestVersionMetadata != 'ERROR':
+            elif 'ERROR' not in latestVersionMetadata:
                 datasetPidInJson = latestVersionMetadata['data']['datasetPersistentId']
                 persistentUrl = get_url_form_of_pid(datasetPidInJson, installationUrl)
 
@@ -1517,7 +1551,7 @@ def save_dataset_export(
                 # Add to CSV file that the dataset's metadata was downloaded
                 writer.writerow([datasetPidInJson, True])
 
-        elif allVersions == True:
+        elif version == 'all':
 
             allVersionsMetadata = get_dataset_metadata_export(
                 installationUrl, datasetPid, exportFormat, 
@@ -1525,11 +1559,11 @@ def save_dataset_export(
                 returnOwners=False, version='all',
                 headers={}, apiKey=apiKey)
 
-            if allVersionsMetadata == 'ERROR':
+            if 'ERROR' in allVersionsMetadata:
                 # Add to CSV file that the dataset's metadata was not downloaded
                 writer.writerow([datasetPid, False])
 
-            elif allVersionsMetadata != 'ERROR':
+            elif 'ERROR' not in allVersionsMetadata:
 
                 # Get the version number of the latest version
                 latestMajorVersionNumber = allVersionsMetadata['data'][0]['versionNumber']
@@ -1565,11 +1599,10 @@ def save_dataset_export(
 
                 # Add to CSV file that the dataset's metadata was not downloaded
                 writer.writerow([datasetPidInJson, True])
-        sleep(1)
-        
+
 
 def save_dataset_exports(directoryPath, downloadStatusFilePath, installationUrl, datasetPidList, 
-    exportFormat, timeout, verify, excludeFiles, allVersions=False, headers={}, apiKey=''):
+    exportFormat, timeout, verify, excludeFiles, version=':latest', headers={}, apiKey=''):
     
     currentTime = time.strftime('%Y.%m.%d_%H.%M.%S')
     
@@ -1584,10 +1617,10 @@ def save_dataset_exports(directoryPath, downloadStatusFilePath, installationUrl,
         loopObj.set_postfix_str(f'dataset_pid: {datasetPid}')
         save_dataset_export(
             directoryPath, downloadStatusFilePath, installationUrl, datasetPid, 
-            exportFormat, timeout, verify, excludeFiles, allVersions, 
+            exportFormat, timeout, verify, excludeFiles, version, 
             headers={}, apiKey='')
         sleep(1)
-    
+
 
 def get_metadatablock_data(installationUrl, metadatablockName):
     metadatablocksApiEndpoint = f'{installationUrl}/api/v1/metadatablocks/{metadatablockName}'
