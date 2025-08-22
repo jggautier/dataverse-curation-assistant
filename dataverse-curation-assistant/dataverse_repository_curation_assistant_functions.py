@@ -20,6 +20,7 @@ import pandas as pd
 from pathlib import Path
 import re
 import requests
+import sys
 import time
 from time import sleep
 from tkinter import Tk, ttk, Frame, Label, IntVar, Checkbutton, filedialog, NORMAL, DISABLED
@@ -1276,17 +1277,15 @@ def get_dataset_size(installationUrl, datasetIdOrPid, onlyPublishedFiles=False, 
             datasetSizeEndpointUrl, headers={'X-Dataverse-key': apiKey})
         byteSizeTotalInt = get_int_from_size_message(sizeEndpointJson=response.json())
 
-
-    # 
     elif onlyPublishedFiles == True:
-        if installationUrl == 'https://dataverse.harvard.edu':
-            print('Can\'t get sizes of only published datasets in Harvard Dataverse.')
-            print('See https://github.com/IQSS/dataverse.harvard.edu/issues/373')
-            exit()
+        # if installationUrl == 'https://dataverse.harvard.edu':
+        #     print('Can\'t get sizes of only published datasets in Harvard Dataverse.')
+        #     print('See https://github.com/IQSS/dataverse.harvard.edu/issues/373')
+        #     sys.exit()
 
         if isinstance(datasetIdOrPid, int):
             print('datasetIdOrPid must be a PID')
-            exit()
+            sys.exit()
 
         # Get metadata of all published versions (since apiKey is not used here)
         allVersionMetadata = get_dataset_metadata_export(
