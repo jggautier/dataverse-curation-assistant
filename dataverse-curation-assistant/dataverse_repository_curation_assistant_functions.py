@@ -2716,6 +2716,7 @@ def get_dataverse_installations_metadata(
                     perPage = 1
                     params['start'] = start + i
 
+                    sleep(1)
                     response = requests.get(
                         searchApiUrl,
                         params=params,
@@ -3061,6 +3062,7 @@ def get_dataverse_installations_metadata(
                 for start in loopObj:
                     get_dataset_info_dict(
                         start, headers, installationName, misindexedDatasetsCount, getCollectionInfo)
+                    sleep(1)
 
                 # Get new dataset count based on number of PIDs saved from Search API
                 datasetCount = len(datasetPids)
@@ -3101,6 +3103,7 @@ def get_dataverse_installations_metadata(
                             installationUrl,
                             datasetPid,
                             datasetPidCollectionAliasDict)
+                        sleep(1)
 
                     datasetPidCollectionAliasDF = pd.DataFrame(datasetPidCollectionAliasDict)
                     datasetPidsFileDF = pd.merge(datasetPidsFileDF, datasetPidCollectionAliasDF, how='left', on='dataset_pid')
