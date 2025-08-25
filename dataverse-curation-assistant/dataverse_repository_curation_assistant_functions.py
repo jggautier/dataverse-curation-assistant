@@ -1577,7 +1577,10 @@ def save_dataset_export(
                         'status': 'OK',
                         'data': datasetVersion}
 
-                    datasetPidInJson = datasetVersion['data']['datasetPersistentId']
+                    # datasetPidInJson = datasetVersion['data']['datasetPersistentId']
+                    # If datasetPersistentId not in data dictionary, maybe because installation is 
+                    # using 4.x version of Dataverse, use datasetPid instead
+                    datasetPidInJson = improved_get(datasetVersion, 'data.datasetPersistentId', datasetPid)
                     persistentUrl = get_url_form_of_pid(datasetPidInJson, installationUrl)
 
                     versionState = datasetVersion['data']['versionState']
