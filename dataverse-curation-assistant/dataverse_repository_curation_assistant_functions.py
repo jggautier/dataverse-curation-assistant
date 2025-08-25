@@ -3131,7 +3131,7 @@ def get_dataverse_installations_metadata(
                     timeout=60,
                     verify=False,
                     excludeFiles=False, 
-                    allVersions=True, 
+                    version='all', 
                     headers=headers, 
                     apiKey='')
 
@@ -3174,7 +3174,7 @@ def get_dataverse_installations_metadata(
                         timeout=60,
                         verify=False,
                         excludeFiles=False, 
-                        allVersions=True, 
+                        verion='all', 
                         headers=headers, 
                         apiKey='')
 
