@@ -3180,7 +3180,7 @@ def get_dataverse_installations_metadata(
                         timeout=60,
                         verify=False,
                         excludeFiles=False, 
-                        verion='all', 
+                        version='all',
                         headers=headers, 
                         apiKey='')
 
