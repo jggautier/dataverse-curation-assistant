@@ -1251,7 +1251,9 @@ def get_int_from_size_message(sizeEndpointJson):
     message = sizeEndpointJson['data']['message']
 
     if 'collection' in message:
-        byteSizeString = message.lstrip('Total recorded size of the files stored in this collection (user-uploaded files plus the versions in the archival tab-delimited format when applicable): ').rstrip(' bytes')
+        byteSizeString = (message
+                          .lstrip('Total recorded size of the files stored in this collection (user-uploaded files plus the versions in the archival tab-delimited format when applicable): ')
+                          .rstrip(' bytes'))
         byteSizeInt = int(byteSizeString.replace(',', ''))
 
     elif 'dataset' in message:
