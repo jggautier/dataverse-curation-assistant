@@ -1480,7 +1480,7 @@ def save_dataset_export(
 
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-    with open(downloadStatusFilePath, mode='a', newline='', encoding='utf-8') as downloadStatusFile:
+    with open(downloadStatusFilePath, mode='a', newline='', encoding='utf-8-sig') as downloadStatusFile:
         writer = csv.writer(
             downloadStatusFile, delimiter=',', quotechar='"', 
             quoting=csv.QUOTE_MINIMAL)
@@ -1906,7 +1906,7 @@ def delete_empty_csv_files(csvDirectory):
     fieldsWithNoMetadata = []
     for file in glob.glob(os.path.join(csvDirectory, '*.csv')):
 
-        with open(file, mode='r', encoding='utf-8') as f:
+        with open(file, mode='r', encoding='utf-8-sig') as f:
             reader = csv.reader(f, delimiter=',')
             data = list(reader)
             rowCount = len(data)
@@ -2077,7 +2077,7 @@ def get_dataset_metadata(
                     valueList.insert(6, dataverseAlias)
 
                     # Add row containing metadata of the dataset
-                    with open(citationMetadataCsvFilePath, mode='a', newline='', encoding='utf-8') as f:
+                    with open(citationMetadataCsvFilePath, mode='a', newline='', encoding='utf-8-sig') as f:
                         writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                         writer.writerow(valueList) 
 
@@ -2447,7 +2447,7 @@ def get_monthly_counts(installationUrl, objects, directoryPath):
 
     monthlyCountsApiEndpoint = f'{installationUrl}/api/info/metrics/{objects}/monthly'
 
-    with open(csvFilePath, mode='a', newline='', encoding='utf-8') as f:
+    with open(csvFilePath, mode='a', newline='', encoding='utf-8-sig') as f:
         writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         with requests.Session() as s:
@@ -2841,7 +2841,7 @@ def get_dataverse_installations_metadata(
 
     installationInfoFilePath = os.path.join(allInstallationsMetadataDirectory, f'dataverse_installations_summary_{currentTime}.csv')
 
-    with open(installationInfoFilePath, mode='w', newline='', encoding='utf-8') as installationInfo:
+    with open(installationInfoFilePath, mode='w', newline='', encoding='utf-8-sig') as installationInfo:
         installationInfoWriter = csv.writer(
             installationInfo, delimiter=',', quotechar='"',
             quoting=csv.QUOTE_MINIMAL)
@@ -3110,7 +3110,7 @@ def get_dataverse_installations_metadata(
 
                 # Export datasetPidsFileDF as a CSV file...
                 datasetPidsFile = f'{installationDirectory}/dataset_pids_{installationNameTemp}_{currentTime}.csv'
-                datasetPidsFileDF.to_csv(datasetPidsFile, index=True)
+                datasetPidsFileDF.to_csv(datasetPidsFile, index=True, encoding='utf-8-sig')
 
                 # Create directory for dataset JSON metadata
                 dataverseJsonMetadataDirectory = f'{installationDirectory}/Dataverse_JSON_metadata_{currentTime}'
@@ -3232,7 +3232,7 @@ def get_dataverse_installations_metadata(
 
                 # Retain only columns with aliases and categories
                 dataverseCollectionInfoDF = dataverseCollectionInfoDF[['dataverse_collection_alias', 'dataverse_collection_type']]
-                # dataverseCollectionInfoDF.to_csv(f'{installationDirectory}/dataverseCollectionInfoDF.csv', index=False)
+                # dataverseCollectionInfoDF.to_csv(f'{installationDirectory}/dataverseCollectionInfoDF.csv', index=False, encoding='utf-8-sig')
 
                 # Merge datasetPidsFileDF and downloadProgressDF
                 mergedDF = pd.merge(mergedDF, dataverseCollectionInfoDF, how='left', on='dataverse_collection_alias').drop_duplicates()
@@ -3250,7 +3250,7 @@ def get_dataverse_installations_metadata(
                     ]]
 
                 # Export merged dataframe (overwriting old datasetPidsFile)
-                mergedDF.to_csv(datasetPidsFile, index=False)
+                mergedDF.to_csv(datasetPidsFile, index=False, encoding='utf-8-sig')
 
         with open(installationInfoFilePath, mode='a', newline='', encoding='utf-8-sig') as installationInfo:
             installationInfoWriter = csv.writer(
