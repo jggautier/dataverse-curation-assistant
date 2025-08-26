@@ -2951,6 +2951,7 @@ def get_dataverse_installations_metadata(
             response = requests.get(rootCollectionInfoEndpoint, headers=headers)
             rootCollectionJson = response.json()
             rootCollectionName = rootCollectionJson['data']['name']
+            print(rootCollectionName)
             # rootCollectionName = 'test'
             metadataSource = f'metadataSource:"{rootCollectionName}"'
 
@@ -2958,6 +2959,7 @@ def get_dataverse_installations_metadata(
             # searchApiCheckUrl = f'{installationUrl}/api/v1/search?q=*&fq=-metadataSource:"Harvested"&type=dataset&per_page=1&sort=date&order=desc'
             searchApiCheckUrl = f'{installationUrl}/api/v1/search?q=*&fq={metadataSource}&type=dataset&per_page=1&sort=date&order=desc'
             searchApiCheckUrl = searchApiCheckUrl.replace('//api', '/api')
+            print(searchApiCheckUrl)
             searchApiStatus = check_api_endpoint(searchApiCheckUrl, headers, verify=False, jsonResponseExpected=True)
 
             # If Search API works, from Search API query results, get count of local (non-harvested) datasets
