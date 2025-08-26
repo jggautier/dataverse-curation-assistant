@@ -2952,7 +2952,7 @@ def get_dataverse_installations_metadata(
             rootCollectionJson = response.json()
             rootCollectionName = rootCollectionJson['data']['name']
             # rootCollectionName = 'test'
-            metadataSource = f'metadataSource:{rootCollectionName}'
+            metadataSource = f'metadataSource:"{rootCollectionName}"'
 
             # Check if Search API works for the installation
             # searchApiCheckUrl = f'{installationUrl}/api/v1/search?q=*&fq=-metadataSource:"Harvested"&type=dataset&per_page=1&sort=date&order=desc'
