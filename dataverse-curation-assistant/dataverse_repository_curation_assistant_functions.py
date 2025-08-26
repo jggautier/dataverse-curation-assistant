@@ -2664,14 +2664,18 @@ def get_dataverse_installations_metadata(
     # Function for getting metadata and other information from known Dataverse installations.
     # Used for publishing a series of datasets in the collection at https://dataverse.harvard.edu/dataverse/dataverse-ux-research-dataverse
 
-    def get_dataset_info_dict(start, headers, installationName, misindexedDatasetsCount, getCollectionInfo=True):
+    def get_dataset_info_dict(
+        start, headers, installationName, rootCollectionName,
+        misindexedDatasetsCount, getCollectionInfo=True):
+
         searchApiUrl = f'{installationUrl}/api/search'
         try:
             perPage = 10
 
             params = {
                 'q': '*',
-                'fq': ['-metadataSource:"Harvested"'],
+                # 'fq': ['-metadataSource:"Harvested"'],
+                'fq': [f'metadataSource:{rootCollectionName}'],
                 'type': ['dataset'],
                 'per_page': perPage,
                 'start': start}
@@ -3053,15 +3057,19 @@ def get_dataverse_installations_metadata(
                 else:
                     getCollectionInfo = True
 
-                # with tqdm_joblib(tqdm(bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}', total=startsListCount)) as progress_bar:
-                #     Parallel(n_jobs=1, backend='threading')(delayed(get_dataset_info_dict)(
-                #         start, headers, installationName, misindexedDatasetsCount, getCollectionInfo) for start in startsList)   
+                # Get name of installation's Root collection, which I'll use in the Search API call to
+                # get only datasets published in the repository
+                rootCollectionInfoEndpoint = f'{installationUrl}/api/dataverses/:root'
 
+                response = requests.get(rootCollectionInfoEndpoint, headers=headers)
+                rootCollectionJson = response.json()
+                rootCollectionName = rootCollectionJson['data']['name']
 
                 loopObj = tqdm(bar_format=tqdm_bar_format, iterable=startsList)
                 for start in loopObj:
                     get_dataset_info_dict(
-                        start, headers, installationName, misindexedDatasetsCount, getCollectionInfo)
+                        start, headers, installationName, rootCollectionName,
+                        misindexedDatasetsCount, getCollectionInfo)
                     sleep(1)
 
                 # Get new dataset count based on number of PIDs saved from Search API
