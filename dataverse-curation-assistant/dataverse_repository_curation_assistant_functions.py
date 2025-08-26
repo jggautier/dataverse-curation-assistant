@@ -2674,8 +2674,8 @@ def get_dataverse_installations_metadata(
 
             params = {
                 'q': '*',
-                # 'fq': ['-metadataSource:"Harvested"'],
-                'fq': [f'metadataSource:{rootCollectionName}'],
+                'fq': ['-metadataSource:"Harvested"'],
+                # 'fq': [f'metadataSource:{rootCollectionName}'],
                 'type': ['dataset'],
                 'per_page': perPage,
                 'start': start}
