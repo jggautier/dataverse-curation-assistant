@@ -2664,8 +2664,6 @@ def get_dataverse_installations_metadata(
     # Function for getting metadata and other information from known Dataverse installations.
     # Used for publishing a series of datasets in the collection at https://dataverse.harvard.edu/dataverse/dataverse-ux-research-dataverse
 
-    # 'fq': [f'metadataSource:{rootCollectionName}'],
-
     def get_dataset_info_dict(
         start, headers, installationName, metadataSource,
         misindexedDatasetsCount, getCollectionInfo=True):
@@ -2951,15 +2949,12 @@ def get_dataverse_installations_metadata(
             response = requests.get(rootCollectionInfoEndpoint, headers=headers)
             rootCollectionJson = response.json()
             rootCollectionName = rootCollectionJson['data']['name']
-            print(rootCollectionName)
-            # rootCollectionName = 'test'
             metadataSource = f'metadataSource:"{rootCollectionName}"'
 
             # Check if Search API works for the installation
             # searchApiCheckUrl = f'{installationUrl}/api/v1/search?q=*&fq=-metadataSource:"Harvested"&type=dataset&per_page=1&sort=date&order=desc'
             searchApiCheckUrl = f'{installationUrl}/api/v1/search?q=*&fq={metadataSource}&type=dataset&per_page=1&sort=date&order=desc'
             searchApiCheckUrl = searchApiCheckUrl.replace('//api', '/api')
-            print(searchApiCheckUrl)
             searchApiStatus = check_api_endpoint(searchApiCheckUrl, headers, verify=False, jsonResponseExpected=True)
 
             # If Search API works, from Search API query results, get count of local (non-harvested) datasets
