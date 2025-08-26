@@ -2664,6 +2664,8 @@ def get_dataverse_installations_metadata(
     # Function for getting metadata and other information from known Dataverse installations.
     # Used for publishing a series of datasets in the collection at https://dataverse.harvard.edu/dataverse/dataverse-ux-research-dataverse
 
+    # 'fq': [f'metadataSource:{rootCollectionName}'],
+
     def get_dataset_info_dict(
         start, headers, installationName, rootCollectionName,
         misindexedDatasetsCount, getCollectionInfo=True):
@@ -2675,7 +2677,6 @@ def get_dataverse_installations_metadata(
             params = {
                 'q': '*',
                 'fq': ['-metadataSource:"Harvested"'],
-                # 'fq': [f'metadataSource:{rootCollectionName}'],
                 'type': ['dataset'],
                 'per_page': perPage,
                 'start': start}
@@ -3059,11 +3060,12 @@ def get_dataverse_installations_metadata(
 
                 # Get name of installation's Root collection, which I'll use in the Search API call to
                 # get only datasets published in the repository
-                rootCollectionInfoEndpoint = f'{installationUrl}/api/dataverses/:root'
+                # rootCollectionInfoEndpoint = f'{installationUrl}/api/dataverses/:root'
 
-                response = requests.get(rootCollectionInfoEndpoint, headers=headers)
-                rootCollectionJson = response.json()
-                rootCollectionName = rootCollectionJson['data']['name']
+                # response = requests.get(rootCollectionInfoEndpoint, headers=headers)
+                # rootCollectionJson = response.json()
+                # rootCollectionName = rootCollectionJson['data']['name']
+                rootCollectionName = 'test'
 
                 loopObj = tqdm(bar_format=tqdm_bar_format, iterable=startsList)
                 for start in loopObj:
