@@ -2667,16 +2667,24 @@ def get_dataverse_installations_metadata(
     # 'fq': [f'metadataSource:{rootCollectionName}'],
 
     def get_dataset_info_dict(
-        start, headers, installationName, rootCollectionName,
+        start, headers, installationName, metadataSource,
         misindexedDatasetsCount, getCollectionInfo=True):
 
         searchApiUrl = f'{installationUrl}/api/search'
+
         try:
             perPage = 10
 
+            # params = {
+            #     'q': '*',
+            #     'fq': ['-metadataSource:"Harvested"'],
+            #     'type': ['dataset'],
+            #     'per_page': perPage,
+            #     'start': start}
+            
             params = {
                 'q': '*',
-                'fq': ['-metadataSource:"Harvested"'],
+                'fq': metadataSource,
                 'type': ['dataset'],
                 'per_page': perPage,
                 'start': start}
@@ -2937,8 +2945,18 @@ def get_dataverse_installations_metadata(
 
             print(f'Dataverse version: {dataverseVersion}')
 
+            # Get name of installation's Root collection, which I'll use in the Search API call to
+            # get only datasets published in the repository
+            rootCollectionInfoEndpoint = f'{installationUrl}/api/dataverses/:root'
+            response = requests.get(rootCollectionInfoEndpoint, headers=headers)
+            rootCollectionJson = response.json()
+            rootCollectionName = rootCollectionJson['data']['name']
+            # rootCollectionName = 'test'
+            metadataSource = f'metadataSource:{rootCollectionName}'
+
             # Check if Search API works for the installation
-            searchApiCheckUrl = f'{installationUrl}/api/v1/search?q=*&fq=-metadataSource:"Harvested"&type=dataset&per_page=1&sort=date&order=desc'
+            # searchApiCheckUrl = f'{installationUrl}/api/v1/search?q=*&fq=-metadataSource:"Harvested"&type=dataset&per_page=1&sort=date&order=desc'
+            searchApiCheckUrl = f'{installationUrl}/api/v1/search?q=*&fq={metadataSource}&type=dataset&per_page=1&sort=date&order=desc'
             searchApiCheckUrl = searchApiCheckUrl.replace('//api', '/api')
             searchApiStatus = check_api_endpoint(searchApiCheckUrl, headers, verify=False, jsonResponseExpected=True)
 
@@ -3058,19 +3076,10 @@ def get_dataverse_installations_metadata(
                 else:
                     getCollectionInfo = True
 
-                # Get name of installation's Root collection, which I'll use in the Search API call to
-                # get only datasets published in the repository
-                # rootCollectionInfoEndpoint = f'{installationUrl}/api/dataverses/:root'
-
-                # response = requests.get(rootCollectionInfoEndpoint, headers=headers)
-                # rootCollectionJson = response.json()
-                # rootCollectionName = rootCollectionJson['data']['name']
-                rootCollectionName = 'test'
-
                 loopObj = tqdm(bar_format=tqdm_bar_format, iterable=startsList)
                 for start in loopObj:
                     get_dataset_info_dict(
-                        start, headers, installationName, rootCollectionName,
+                        start, headers, installationName, metadataSource,
                         misindexedDatasetsCount, getCollectionInfo)
                     sleep(1)
 
