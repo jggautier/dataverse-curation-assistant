@@ -1422,7 +1422,7 @@ def get_dataset_metadata_export(
                 if response.status_code == 200 and 'metadataBlocks' in response.json()['data'][0]:
                     data = response.json()
                 else:
-                    data = 'ERROR'
+                    data = f'ERROR: {response.status_code}'
             except Exception as e:
                 data = f'ERROR: {e}'
 
@@ -1580,8 +1580,12 @@ def save_dataset_export(
                     # datasetPidInJson = datasetVersion['data']['datasetPersistentId']
                     # If datasetPersistentId not in data dictionary, maybe because installation is 
                     # using 4.x version of Dataverse, use datasetPid instead
+
+                    # If there's no datasetPersistentId, consider inserting  it with datasetPid as the value
+                    # See dataverse_json exports of the installation "RepOD"
                     datasetPidInJson = improved_get(datasetVersion, 'data.datasetPersistentId', datasetPid)
-                    persistentUrl = get_url_form_of_pid(datasetPidInJson, installationUrl)
+                    
+                    # persistentUrl = get_url_form_of_pid(datasetPidInJson, installationUrl)
 
                     versionState = datasetVersion['data']['versionState']
                     if versionState == 'DRAFT':
@@ -2924,7 +2928,7 @@ def get_dataverse_installations_metadata(
 
             if getInstallationVersionApiStatus != 'OK':
                 # Remove 'User-Agent' from headers to see if that lets me use Dataverse API
-                print(f'\tGet installation version API failed. Removing User-Agent from headers and trying again.')
+                print(f'Get installation version API failed. Removing User-Agent from headers and trying again.')
                 headers.pop('User-Agent', None)
 
                 getInstallationVersionApiStatus = check_api_endpoint(
