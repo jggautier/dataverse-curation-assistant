@@ -265,7 +265,7 @@ def check_installation_url_status(string, requestTimeout=20, headers={}):
 
     elif '(' in string:
         installationUrl = re.search(r'\(.*\)', string).group()
-        installationUrl = re.sub('\(|\)', '', installationUrl)
+        installationUrl = re.sub(r'\(|\)', '', installationUrl)
         # Use requests to get the final redirect URL. At least on installation, sodha, redirects to www.sodha.be
         try:
             installationUrl = requests.get(installationUrl, timeout=requestTimeout, verify=False).url
