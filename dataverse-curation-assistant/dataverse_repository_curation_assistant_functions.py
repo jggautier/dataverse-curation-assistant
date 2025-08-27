@@ -348,7 +348,7 @@ def sanitize_version(version):
     # Specifically look for a major/minor semver-formatted version
     # https://stackoverflow.com/questions/15340582/python-extract-pattern-matches
     # Adapted from code by Goeff Thomas. See https://www.kaggle.com/code/goefft/check-dataverse-installation-versions
-    result = re.compile('(\d+\.)?(\d+\.)?(\*|\d+)').search(version)
+    result = re.compile(r'(\d+\.)?(\d+\.)?(\*|\d+)').search(version)
     if result is None:
         return 'NA'
     return result.group()
@@ -494,7 +494,7 @@ def get_search_api_url(url):
         apiSearchURL = urllib.parse.unquote(apiSearchURL) + '&show_entity_ids=true' + subtree
 
         # Remove any digits after any fq parameters
-        apiSearchURL = re.sub('fq\d', 'fq', apiSearchURL)
+        apiSearchURL = re.sub(r'fq\d', 'fq', apiSearchURL)
 
         apiSearchURL = apiSearchURL + '&per_page=10&start=0'
 
@@ -511,8 +511,8 @@ def get_search_api_url(url):
             pass
 
         # Remove dvObjectType and types parameters, which I think the Search API is ignoring
-        apiSearchURL = re.sub('fq=dvObjectType:\(.*\)&', '', apiSearchURL)
-        apiSearchURL = re.sub('types=.*?&', '', apiSearchURL)
+        apiSearchURL = re.sub(r'fq=dvObjectType:\(.*\)&', '', apiSearchURL)
+        apiSearchURL = re.sub(r'types=.*?&', '', apiSearchURL)
 
     return apiSearchURL
 
@@ -646,7 +646,7 @@ def get_params(apiSearchURL, metadataFieldsList=None):
     fq = []
 
     # Split apiSearchURL to create list of params
-    splitSearchURLList = re.split('\?q|&fq|&', apiSearchURL)
+    splitSearchURLList = re.split(r'\?q|&fq|&', apiSearchURL)
 
     # Remove base search API URL from list
     params['baseUrl'] = splitSearchURLList[0]
@@ -1085,7 +1085,7 @@ def get_canonical_pid(pidOrUrl):
 
     # If entered dataset PID is a DOI URL, get canonical PID
     elif pidOrUrl.startswith('http') and 'doi.' in pidOrUrl:
-        canonicalPid = re.sub('http.*org\/', 'doi:', pidOrUrl)
+        canonicalPid = re.sub(r'http.*org\/', 'doi:', pidOrUrl)
 
     # If entered dataset PID is a canonical DOI, save it as canonicalPid
     elif pidOrUrl.startswith('doi:') and '/' in pidOrUrl:
@@ -1093,7 +1093,7 @@ def get_canonical_pid(pidOrUrl):
 
     # If entered dataset PID is a Handle URL, get canonical PID
     elif pidOrUrl.startswith('http') and 'hdl.' in pidOrUrl:
-        canonicalPid = re.sub('http.*net\/', 'hdl:', pidOrUrl)
+        canonicalPid = re.sub(r'http.*net\/', 'hdl:', pidOrUrl)
 
     # If entered dataset PID is a canonical HDL, save it as canonicalPid
     elif pidOrUrl.startswith('hdl:') and '/' in pidOrUrl:
