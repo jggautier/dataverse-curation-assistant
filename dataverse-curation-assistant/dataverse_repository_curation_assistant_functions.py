@@ -1627,7 +1627,7 @@ def save_dataset_exports(directoryPath, downloadStatusFilePath, installationUrl,
             directoryPath, downloadStatusFilePath, installationUrl, datasetPid, 
             exportFormat, timeout, verify, excludeFiles, version, 
             headers={}, apiKey='')
-        sleep(1)
+        sleep(0.5)
 
 
 def get_metadatablock_data(installationUrl, metadatablockName):
@@ -2799,8 +2799,8 @@ def get_dataverse_installations_metadata(
         datasetsDF = pd.read_csv(spreadsheetFilePath)
         datasetPidList = datasetsDF['dataset_pid'].values.tolist()
 
-        countOfPids = len(datasetPidList)
-        countFromFiles = len(filesListFromExports)
+        # countOfPids = len(datasetPidList)
+        # countFromFiles = len(filesListFromExports)
 
         missingDatasets = list(set(datasetPidList) - set(filesListFromExports))
 
@@ -2808,7 +2808,7 @@ def get_dataverse_installations_metadata(
 
 
     # Get directory that this Python script is in
-    currrentWorkingDirectory = os.getcwd()
+    # currrentWorkingDirectory = os.getcwd()
 
     # Save current time for folder and file timestamps
     currentTime = time.strftime('%Y.%m.%d_%H.%M.%S')
@@ -3097,7 +3097,7 @@ def get_dataverse_installations_metadata(
                     print(f'\n\nUnretrievable dataset PIDs due to misindexing: {misindexedDatasetsCount}\n')
 
                 # Create dataframe from datasetInfoDict, which lists dataset basic info from Search API.
-                # And remove duplicate rows from the dataframe. At least one repository has two published versions of the same dataset indexed. 
+                # and remove duplicate rows from the dataframe. At least one repository has two published versions of the same dataset indexed. 
                 # See https://dataverse.rhi.hi.is/dataverse/root/?q=1.00002
                 datasetPidsFileDF = pd.DataFrame(datasetInfoDict).set_index('dataset_pid').drop_duplicates()
 
@@ -3107,13 +3107,6 @@ def get_dataverse_installations_metadata(
                     print(f'\rCollection info not included in installation\'s Search API results. Scraping webpages to get collection aliases')
                     
                     datasetPidCollectionAliasDict = []
-
-                    # with tqdm_joblib(tqdm(bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}', total=datasetCount)) as progress_bar:
-                    #     Parallel(n_jobs=nJobsForApiCalls, backend='threading')(delayed(get_dataverse_collection_info_web_scraping)(
-                    #         installationUrl,
-                    #         datasetPid,
-                    #         datasetPidCollectionAliasDict
-                    #         ) for datasetPid in datasetPids)
 
                     loopObj = tqdm(bar_format=tqdm_bar_format, iterable=datasetPids)
                     for datasetPid in loopObj:
