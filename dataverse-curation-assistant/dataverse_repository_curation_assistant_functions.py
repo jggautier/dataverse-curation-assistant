@@ -1627,7 +1627,7 @@ def save_dataset_exports(directoryPath, downloadStatusFilePath, installationUrl,
             directoryPath, downloadStatusFilePath, installationUrl, datasetPid, 
             exportFormat, timeout, verify, excludeFiles, version, 
             headers={}, apiKey='')
-        sleep(0.5)
+        sleep(0.75)
 
 
 def get_metadatablock_data(installationUrl, metadatablockName):
@@ -2950,7 +2950,7 @@ def get_dataverse_installations_metadata(
             # Get name of installation's Root collection, which I'll use in the Search API call to
             # get only datasets published in the repository
             rootCollectionInfoEndpoint = f'{installationUrl}/api/dataverses/:root'
-            response = requests.get(rootCollectionInfoEndpoint, headers=headers)
+            response = requests.get(rootCollectionInfoEndpoint, headers=headers, timeout=requestTimeout, verify=False)
             rootCollectionJson = response.json()
             rootCollectionName = rootCollectionJson['data']['name']
             metadataSource = f'metadataSource:"{rootCollectionName}"'
