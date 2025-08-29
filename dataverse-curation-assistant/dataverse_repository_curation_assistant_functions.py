@@ -1561,6 +1561,7 @@ def save_dataset_export(
                 headers=headers, apiKey=apiKey)
 
             if 'ERROR' in allVersionsMetadata:
+                print(allVersionsMetadata)
                 # Add to CSV file that the dataset's metadata was not downloaded
                 writer.writerow([datasetPid, False])
 
@@ -1582,13 +1583,11 @@ def save_dataset_export(
                     # If datasetPersistentId not in data dictionary, maybe because installation is 
                     # using 4.x version of Dataverse, use datasetPid instead
                     datasetPidInJson = improved_get(datasetVersion, 'data.datasetPersistentId', datasetPid)
-                    
+
                     # If there's no datasetPersistentId, consider inserting  it with datasetPid as the value
                     # See dataverse_json exports of the installation "RepOD"
-                    if datasetPidInJson is None:
+                    if 'datasetPersistentId' not in datasetVersion['data']:
                         datasetVersion['data']['datasetPersistentId'] = datasetPid
-                    
-                    # persistentUrl = get_url_form_of_pid(datasetPidInJson, installationUrl)
 
                     versionState = datasetVersion['data']['versionState']
                     if versionState == 'DRAFT':
