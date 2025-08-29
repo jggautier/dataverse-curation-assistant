@@ -1418,8 +1418,6 @@ def get_dataset_metadata_export(
                     headers=headers,
                     timeout=timeout, 
                     verify=verify)
-                
-                print(response.url)
 
                 if response.status_code == 200 and 'metadataBlocks' in response.json()['data'][0]:
                     data = response.json()
