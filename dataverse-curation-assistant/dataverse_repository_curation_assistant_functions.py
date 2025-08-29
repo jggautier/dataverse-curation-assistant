@@ -1418,6 +1418,8 @@ def get_dataset_metadata_export(
                     headers=headers,
                     timeout=timeout, 
                     verify=verify)
+                
+                print(response.url)
 
                 if response.status_code == 200 and 'metadataBlocks' in response.json()['data'][0]:
                     data = response.json()
@@ -1491,7 +1493,7 @@ def save_dataset_export(
                 installationUrl, datasetPid, exportFormat, 
                 timeout, verify=verify, excludeFiles=excludeFiles, 
                 returnOwners=False, version=version,
-                headers={}, apiKey=apiKey)
+                headers=headers, apiKey=apiKey)
 
             if 'ERROR' in specificVersionMetadata or specificVersionMetadata['data']['versionState'] == 'DEACCESSIONED':
                 # Add to CSV file that the dataset's metadata was not downloaded
@@ -1524,7 +1526,7 @@ def save_dataset_export(
                 installationUrl, datasetPid, exportFormat, 
                 timeout, verify=verify, excludeFiles=excludeFiles, 
                 returnOwners=False, version=':latest',
-                headers={}, apiKey=apiKey)
+                headers=headers, apiKey=apiKey)
 
             if 'ERROR' in latestVersionMetadata or latestVersionMetadata['data']['versionState'] == 'DEACCESSIONED':
                 # Add to CSV file that the dataset's metadata was not downloaded
@@ -1558,7 +1560,7 @@ def save_dataset_export(
                 installationUrl, datasetPid, exportFormat, 
                 timeout, verify, excludeFiles, 
                 returnOwners=False, version='all',
-                headers={}, apiKey=apiKey)
+                headers=headers, apiKey=apiKey)
 
             if 'ERROR' in allVersionsMetadata:
                 # Add to CSV file that the dataset's metadata was not downloaded
@@ -1626,7 +1628,7 @@ def save_dataset_exports(directoryPath, downloadStatusFilePath, installationUrl,
         save_dataset_export(
             directoryPath, downloadStatusFilePath, installationUrl, datasetPid, 
             exportFormat, timeout, verify, excludeFiles, version, 
-            headers={}, apiKey='')
+            headers=headers, apiKey=apiKey)
         sleep(0.75)
 
 
