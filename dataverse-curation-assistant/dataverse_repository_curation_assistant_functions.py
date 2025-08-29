@@ -2758,9 +2758,9 @@ def get_dataverse_installations_metadata(
                     misindexedDatasetsCount += 1
 
 
-    def get_dataverse_collection_info_web_scraping(installationUrl, datasetPid, datasetPidCollectionAliasDict):
+    def get_dataverse_collection_info_web_scraping(installationUrl, datasetPid, datasetPidCollectionAliasDict, headers):
         pageUrl = f'{installationUrl}/dataset.xhtml?persistentId={datasetPid}'
-        response = requests.get(pageUrl)
+        response = requests.get(pageUrl, verify=False, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
         mydivs = soup.find_all('a', {'class': 'dataverseHeaderDataverseName'})
         dataverseHeaderDataverseName = str(mydivs[0])
@@ -3115,7 +3115,8 @@ def get_dataverse_installations_metadata(
                         get_dataverse_collection_info_web_scraping(
                             installationUrl,
                             datasetPid,
-                            datasetPidCollectionAliasDict)
+                            datasetPidCollectionAliasDict,
+                            headers=headers)
                         sleep(1)
 
                     datasetPidCollectionAliasDF = pd.DataFrame(datasetPidCollectionAliasDict)
