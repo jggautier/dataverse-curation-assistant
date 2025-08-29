@@ -2479,8 +2479,8 @@ def get_citation_count(datasetPid):
     return citationCount
 
 
-def get_mdc_metrics(datasetPid):
-    meticsDict = {
+def get_mdc_metrics(datasetPid, headers):
+    metricsDict = {
         'status': 'OK',
         'dataset_pid': datasetPid,
         }
@@ -2488,26 +2488,26 @@ def get_mdc_metrics(datasetPid):
     pidForDatacite = datasetPid.replace('doi:', '')
     dataciteEventsAPI = f'https://api.datacite.org/dois/{pidForDatacite}'
     try:
-        response = requests.get(dataciteEventsAPI)
+        response = requests.get(dataciteEventsAPI, headers=headers)
         attributes = response.json()['data']['attributes']
 
-        meticsDict['mdc_citation_count'] = improved_get(attributes, 'citationCount')
-        meticsDict['mdc_view_count'] = improved_get(attributes, 'viewCount')
-        meticsDict['mdc_download_count'] = improved_get(attributes, 'downloadCount')
+        metricsDict['mdc_citation_count'] = improved_get(attributes, 'citationCount')
+        metricsDict['mdc_view_count'] = improved_get(attributes, 'viewCount')
+        metricsDict['mdc_download_count'] = improved_get(attributes, 'downloadCount')
 
     except Exception:
         try:
             status = response.json()['errors'][0]['title']
-            meticsDict['mdc_citation_count'] = status
-            meticsDict['mdc_view_count'] = status
-            meticsDict['mdc_download_count'] = status
+            metricsDict['mdc_citation_count'] = status
+            metricsDict['mdc_view_count'] = status
+            metricsDict['mdc_download_count'] = status
         except Exception as e:
             status = e
-            meticsDict['mdc_citation_count'] = status
-            meticsDict['mdc_view_count'] = status
-            meticsDict['mdc_download_count'] = status
+            metricsDict['mdc_citation_count'] = status
+            metricsDict['mdc_view_count'] = status
+            metricsDict['mdc_download_count'] = status
     
-    return meticsDict
+    return metricsDict
 
 
 def get_mdc_metrics_dataframe(datasetPidsList):
