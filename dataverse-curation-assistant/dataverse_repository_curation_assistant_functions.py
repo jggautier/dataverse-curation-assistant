@@ -311,7 +311,8 @@ def check_api_endpoint(url, headers, verify=False, jsonResponseExpected=True):
         # print(f'responseStatusCode: {responseStatusCode}')
         # print(responseText)
         
-        if responseStatusCode == 200:
+        # if responseStatusCode == 200:
+        if responseStatusCode in [200, 202]:
             status = 'OK'
             if jsonResponseExpected is True:
                 try:
@@ -324,7 +325,8 @@ def check_api_endpoint(url, headers, verify=False, jsonResponseExpected=True):
             elif jsonResponseExpected is False:
                 status = responseStatusCode
 
-        elif responseStatusCode != 200:
+        # elif responseStatusCode != 200:
+        elif responseStatusCode not in [200, 202]:
             if jsonResponseExpected is True:
                 try:
                     data = response.json()
@@ -360,11 +362,12 @@ def get_dataverse_installation_version(installationUrl, headers={}):
     statusDict = check_installation_url_status(string=installationUrl, requestTimeout=20, headers=headers)
     statusCode = statusDict['statusCode']
 
-    if statusCode != 200:
+    # if statusCode != 200:
+    if statusCode not in [200, 202]:
         installationVersionDict['dataverseVersion'] = statusCode
         installationVersionDict['dataverseVersionSanitized'] = statusCode
 
-    elif statusCode == 200:
+    elif statusCode in [200, 202]:
         installationUrl = statusDict['installationUrl']
 
         getInstallationVersionApiUrl = f'{installationUrl}/api/v1/info/version'
@@ -1402,9 +1405,9 @@ def get_dataset_metadata_export(
                     timeout=timeout, 
                     verify=verify)
 
-                if response.status_code == 200 and 'metadataBlocks' in response.json()['data']:
+                if response.status_code in [200, 202] and 'metadataBlocks' in response.json()['data']:
                     data = response.json()
-                elif response.status_code != 200:
+                elif response.status_code not in [200, 202]:
                     errorMessage = response.json()['message']
                     data = f'ERROR {str(response.status_code)}: {errorMessage}'
             except Exception as e:
@@ -1419,7 +1422,7 @@ def get_dataset_metadata_export(
                     timeout=timeout, 
                     verify=verify)
 
-                if response.status_code == 200 and 'metadataBlocks' in response.json()['data'][0]:
+                if response.status_code in [200, 202] and 'metadataBlocks' in response.json()['data'][0]:
                     data = response.json()
                 else:
                     data = f'ERROR: {response.status_code}'
@@ -1444,7 +1447,7 @@ def get_dataset_metadata_export(
                 timeout=timeout, 
                 verify=verify)
 
-            if response.status_code == 200:
+            if response.status_code in [200, 202]:
                 
                 if exportFormat in ('schema.org' , 'OAI_ORE'):
                     data = response.json()
@@ -1636,7 +1639,8 @@ def get_metadatablock_data(installationUrl, metadatablockName):
     metadatablocksApiEndpoint = f'{installationUrl}/api/v1/metadatablocks/{metadatablockName}'
 
     response = requests.get(metadatablocksApiEndpoint)
-    if response.status_code == 200:
+    # if response.status_code == 200:
+    if response.status_code not in [200, 202]:
         data = response.json()
         return data
 
@@ -2882,7 +2886,8 @@ def get_dataverse_installations_metadata(
 
         print(f'Installation status for {hostname}: {installationUrlStatusCode}')
 
-        if installationUrlStatusCode != 200:
+        # if installationUrlStatusCode != 200:
+        if installationUrlStatusCode not in [200, 202]:
             installationStatus = installationUrlStatusCode
             dataverseVersion = f'installation_unreachable: {installationUrlStatusCode}'
             dataverseVersionSanitized = f'installation_unreachable: {installationUrlStatusCode}'
@@ -2896,7 +2901,8 @@ def get_dataverse_installations_metadata(
             metadatablockNames = f'installation_unreachable: {installationUrlStatusCode}'
 
         # If there's a good response from the installation, check if Search API works by searching for installation's non-harvested datasets
-        if installationUrlStatusCode == 200:
+        # elif installationUrlStatusCode == 200:
+        elif installationUrlStatusCode in [200, 202]:
 
             # Save time and date when script started downloading from the installation to append it to the installation's directory and files
             currentTime = time.strftime('%Y.%m.%d_%H.%M.%S')
