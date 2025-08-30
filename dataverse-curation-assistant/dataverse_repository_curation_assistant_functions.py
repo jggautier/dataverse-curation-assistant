@@ -2471,18 +2471,18 @@ def get_monthly_counts(installationUrl, objects, directoryPath):
                 writer.writerow(row)
 
 
-def get_citation_count(datasetPid):
-    pidForDatacite = datasetPid.replace('doi:', '')
-    dataciteEventsAPI = f'https://api.datacite.org/dois/{pidForDatacite}'
-    try:
-        response = requests.get(dataciteEventsAPI)
-        citationCount = response.json()['data']['attributes']['citationCount']
-    except Exception:
-        try:
-            citationCount = response.json()['errors'][0]['title']
-        except Exception as e:
-            citationCount = e
-    return citationCount
+# def get_citation_count(datasetPid):
+#     pidForDatacite = datasetPid.replace('doi:', '')
+#     dataciteEventsAPI = f'https://api.datacite.org/dois/{pidForDatacite}'
+#     try:
+#         response = requests.get(dataciteEventsAPI)
+#         citationCount = response.json()['data']['attributes']['citationCount']
+#     except Exception:
+#         try:
+#             citationCount = response.json()['errors'][0]['title']
+#         except Exception as e:
+#             citationCount = e
+#     return citationCount
 
 
 def get_mdc_metrics(datasetPid, headers):
@@ -2532,7 +2532,7 @@ def get_mdc_metrics_dataframe(datasetPidsList):
         }
         allMDCMetricsDict.append(newRow)
 
-        sleep(1)
+        sleep(0.4)
 
     allMDCMetricsDf = pd.DataFrame(allMDCMetricsDict)
 
@@ -2632,7 +2632,7 @@ def get_oai_pmh_record_count(harvestUrl, verb, metadataFormat, harvestingSet):
     if response.status_code == 503:
         countOfRecordsInOAIFeed = 'NA - 503 Service Unavailable'
 
-    elif response.status_code == 200:
+    elif response.status_code in [200, 202]:
         dictData = xmltodict.parse(response.content)
 
         if 'resumptionToken' not in dictData['OAI-PMH'][verb]:
