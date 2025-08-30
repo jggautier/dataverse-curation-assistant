@@ -302,7 +302,7 @@ def get_installation_list():
 def check_api_endpoint(url, headers, verify=False, jsonResponseExpected=True):
     humanDetectionWarning = 'Installation may require javascript. Check if it\'s using Anubis or something else that blocks API use'
     try:
-        response = requests.get(url, headers=headers, timeout=20, verify=verify)
+        response = requests.get(url, headers=headers, timeout=60, verify=verify)
 
         retryAfter = response.headers.get("Retry-After")
         responseStatusCode = response.status_code
