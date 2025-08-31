@@ -1649,7 +1649,7 @@ def get_metadatablock_data(installationUrl, metadatablockName):
 
     response = requests.get(metadatablocksApiEndpoint)
     # if response.status_code == 200:
-    if response.status_code not in [200, 202]:
+    if response.status_code in [200, 202]:
         data = response.json()
         return data
 
