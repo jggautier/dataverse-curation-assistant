@@ -235,12 +235,12 @@ def get_file_path(fileTypes):
 
 
 # Function for getting list of non-hidden directories inside of a given directory
-def listdir_nohidden(path):
-    directories = []
-    for f in os.listdir(path):
-        if not f.startswith('.'):
-            directories.append(f)
-    return directories
+def list_files_nonhidden(path):
+    files = []
+    for file in os.listdir(path):
+        if not file.startswith('.'):
+            files.append(file)
+    return files
 
 
 def select_all(listbox):
