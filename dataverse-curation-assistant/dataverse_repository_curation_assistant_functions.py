@@ -1125,8 +1125,10 @@ def get_url_form_of_pid(canonicalPid, installationUrl):
         pidUrlForm = canonicalPid.replace('hdl:', 'https://hdl.handle.net/')
 
     else:
-        pidUrlForm = f'{installationUrl}/dataset.xhtml?persistentId={canonicalPid}'
-
+        if installationUrl is not None:
+            pidUrlForm = f'{installationUrl}/dataset.xhtml?persistentId={canonicalPid}'
+        elif installationUrl is None:
+            pidUrlForm = canonicalPid
     return pidUrlForm
 
 def get_datasets_from_collection_or_search_url(
@@ -1776,7 +1778,11 @@ def get_metadata_values_lists(
         # elif versions == 'latestVersion':
         #     metadatablockDict = datasetMetadata['data']['datasetVersion']['metadataBlocks']
 
-        metadatablockDict = datasetMetadata['data']['datasetVersion']['metadataBlocks']
+        metadatablockDict = improved_get(datasetMetadata, 'data.datasetVersion.metadataBlocks')
+        if metadatablockDict is None:
+            metadatablockDict = datasetMetadata['data']['metadataBlocks']
+        
+        # datasetMetadata['data']['datasetVersion']['metadataBlocks']
         rowVariablesList = []
         
         # Get names of metadata blocks and name of first metadata block whose name matches the give metadatablockName
