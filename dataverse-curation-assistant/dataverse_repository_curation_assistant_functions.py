@@ -2743,7 +2743,7 @@ def get_dataverse_installations_metadata(
         # See https://github.com/IQSS/dataverse/issues/4225
 
         except Exception as e:
-            print(f'per_page=10 url broken when start is {start}')
+            print(f'per_page={perPage} url broken when start is {start}')
 
             # This code hasn't been tested because I haven't encountered Search API results with misindexed objects
             # since rewriting this code to use the joblib library
@@ -2775,7 +2775,7 @@ def get_dataverse_installations_metadata(
                         datasetInfoDict.append(dict(newRow))
 
                 except Exception:
-                    print(f'per_page=10 url broken when start is {start}')
+                    print(f'per_page={perPage} url broken when start is {start}')
                     misindexedDatasetsCount += 1
 
 
