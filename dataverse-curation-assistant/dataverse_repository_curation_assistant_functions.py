@@ -1575,7 +1575,7 @@ def save_dataset_export(
                 headers=headers, apiKey=apiKey)
 
             if 'ERROR' in allVersionsMetadata:
-                print(allVersionsMetadata)
+                # print(allVersionsMetadata)
                 # Add to CSV file that the dataset's metadata was not downloaded
                 writer.writerow([datasetPid, False])
 
