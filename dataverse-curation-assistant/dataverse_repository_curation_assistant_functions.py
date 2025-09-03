@@ -32,6 +32,7 @@ import urllib.parse
 from urllib.parse import urlparse
 import xmltodict
 import yaml
+import zipfile
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 # The requests module isn't able to verify the SSL cert of some Dataverse installations,
@@ -259,6 +260,19 @@ def delete_hidden_files(directory):
                 continue
 
     print(f'Hidden files deleted: {hiddenFilesCount}')
+
+
+def zip_anything(path, zipPath):
+    with zipfile.ZipFile(zipPath, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        if os.path.isdir(path):
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, path)
+                    zipf.write(file_path, arcname)
+        else:
+            arcname = os.path.basename(path)
+            zipf.write(path, arcname)
 
 
 def select_all(listbox):
