@@ -243,6 +243,24 @@ def list_files_nonhidden(path):
     return files
 
 
+def delete_hidden_files(directory):
+    """
+    Deletes all hidden files in the given directory and its subdirectories.
+    """
+    hiddenFilesCount = 0
+    for root, dirs, files in os.walk(directory):
+        for fileName in files:
+            if fileName.startswith('.'):
+                filePath = os.path.join(root, fileName)
+                # print(filePath)
+                hiddenFilesCount += 1
+                os.remove(filePath)
+                print(f"Deleted hidden file: {filePath}")
+                continue
+
+    print(f'Hidden files deleted: {hiddenFilesCount}')
+
+
 def select_all(listbox):
     listbox.select_set(0, END)
 
