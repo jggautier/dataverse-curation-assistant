@@ -962,6 +962,7 @@ def get_object_dataframe_from_search_api(
         verify=False
     )
     data = response.json()
+    print(response.url)
 
     if data['status'] == 'ERROR':
         text = 'Search API error. Check URL or API key'
@@ -975,6 +976,7 @@ def get_object_dataframe_from_search_api(
 
     elif data['status'] == 'OK':
         totalDatasetCount = data['data']['total_count']
+        print(f'totalDatasetCount: {totalDatasetCount}')
         text = 'Looking for datasets...'
 
         if None not in [rootWindow, progressText, progressLabel]:
@@ -1179,6 +1181,7 @@ def get_datasets_from_collection_or_search_url(
     baseUrl = requestsGetProperties['baseUrl']
     params = requestsGetProperties['params']
 
+    print(requestsGetProperties)
     datasetInfoDF = get_object_dataframe_from_search_api(
         baseUrl=baseUrl, params=params, headers=headers, objectType='dataset', metadataFieldsList=metadataFieldsList,
         printProgress=False, rootWindow=rootWindow, progressText=progressText, 
@@ -1296,9 +1299,9 @@ def get_datasets_from_collection_or_search_url(
 def get_int_from_size_message(sizeEndpointJson):
     message = sizeEndpointJson['data']['message']
 
-    if 'collection' in message:
+    if 'dataverse' in message:
         byteSizeString = (message
-                          .lstrip('Total recorded size of the files stored in this collection (user-uploaded files plus the versions in the archival tab-delimited format when applicable): ')
+                          .lstrip('Total size of the files stored in this dataverse:')
                           .rstrip(' bytes'))
         byteSizeInt = int(byteSizeString.replace(',', ''))
 
@@ -1369,7 +1372,7 @@ def get_dataset_size(installationUrl, datasetIdOrPid, onlyPublishedFiles=False, 
 def get_collection_size(installationUrl, apiKey, collectionIdOrAlias, includeSubCollections=True):
 
     if includeSubCollections is True:
-        collectionSizeEndpointUrl = f'{installationUrl}/api/dataverses/{collectionIdOrAlias}/storage/use'
+        collectionSizeEndpointUrl = f'{installationUrl}/api/dataverses/{collectionIdOrAlias}/storagesize'
 
         response = requests.get(
             collectionSizeEndpointUrl, headers={'X-Dataverse-key': apiKey})
@@ -1467,6 +1470,7 @@ def get_dataset_metadata_export(
 
                 if response.status_code in [200, 202] and 'metadataBlocks' in response.json()['data'][0]:
                     data = response.json()
+                    print(response.url)
                 else:
                     data = f'ERROR: {response.status_code}'
             except Exception as e:
