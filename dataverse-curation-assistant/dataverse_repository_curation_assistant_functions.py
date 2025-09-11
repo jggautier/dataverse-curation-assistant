@@ -975,7 +975,6 @@ def get_object_dataframe_from_search_api(
 
     elif data['status'] == 'OK':
         totalDatasetCount = data['data']['total_count']
-        print(f'totalDatasetCount: {totalDatasetCount}')
         text = 'Looking for datasets...'
 
         if None not in [rootWindow, progressText, progressLabel]:
