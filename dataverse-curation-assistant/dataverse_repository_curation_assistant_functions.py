@@ -1470,7 +1470,6 @@ def get_dataset_metadata_export(
 
                 if response.status_code in [200, 202] and 'metadataBlocks' in response.json()['data'][0]:
                     data = response.json()
-                    print(response.url)
                 else:
                     data = f'ERROR: {response.status_code}'
             except Exception as e:
