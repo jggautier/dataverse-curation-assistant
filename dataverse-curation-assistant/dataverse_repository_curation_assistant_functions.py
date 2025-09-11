@@ -962,7 +962,6 @@ def get_object_dataframe_from_search_api(
         verify=False
     )
     data = response.json()
-    print(response.url)
 
     if data['status'] == 'ERROR':
         text = 'Search API error. Check URL or API key'
