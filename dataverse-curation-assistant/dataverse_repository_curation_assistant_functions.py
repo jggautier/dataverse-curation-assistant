@@ -1012,8 +1012,10 @@ def get_object_dataframe_from_search_api(
                     installationUrl, headers, params, start, objectInfoDict, metadataFieldsList)
 
         else:
-            for start in (pbar := tqdm(startsList, bar_format=tqdm_bar_format)):
-                pbar.set_description(f'Page {start}')
+            loopObj = tqdm(bar_format=tqdm_bar_format, iterable=startsList)
+            for start in loopObj:
+                pageProgress = start + 1
+                loopObj.set_postfix_str(f'Page {pageProgress}')
 
                 get_object_dictionary_from_search_api_page(
                     installationUrl, headers, params, start, objectInfoDict, metadataFieldsList)
