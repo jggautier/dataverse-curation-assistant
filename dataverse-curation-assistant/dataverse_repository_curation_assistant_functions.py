@@ -537,6 +537,8 @@ def get_search_api_url(url):
                 .replace('?q=&', '?q=*&'))
         apiSearchURL = urllib.parse.unquote(apiSearchURL) + '&show_entity_ids=true' + subtree
 
+        # apiSearchURL = convert_str_to_html_encoding(apiSearchURL) + '&show_entity_ids=true' + subtree
+
         # Remove any digits after any fq parameters
         apiSearchURL = re.sub(r'fq\d', 'fq', apiSearchURL)
 
