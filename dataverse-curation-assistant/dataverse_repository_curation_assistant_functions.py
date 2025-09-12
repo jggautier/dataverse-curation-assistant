@@ -2580,14 +2580,14 @@ def get_mdc_metrics(datasetPid, headers):
     return metricsDict
 
 
-def get_mdc_metrics_dataframe(datasetPidsList):
+def get_mdc_metrics_dataframe(datasetPidsList, headers):
     allMDCMetricsDict = []
 
     loopObj = tqdm(bar_format=tqdm_bar_format, iterable=datasetPidsList)
     for datasetPid in loopObj:
         loopObj.set_postfix_str(f'Dataset: {datasetPid}')
 
-        mdcMetricsDict = get_mdc_metrics(datasetPid)
+        mdcMetricsDict = get_mdc_metrics(datasetPid, headers)
         newRow = {
             'dataset_pid': datasetPid,
             'mdc_citation_count': mdcMetricsDict['mdc_citation_count'],
