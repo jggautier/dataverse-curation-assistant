@@ -745,14 +745,14 @@ def get_params(apiSearchURL, metadataFieldsList=None):
     if not any('metadataSource' in i for i in fq):
         fq.append('-metadataSource:"Harvested"')
 
-    # If there's a metadataSource param in the paramString to return only harvested datasets remove it
-    harvestedFQRemoved = False
-    for item in fq[:]:   # Tterate over a shallow copy
-        if item == 'metadataSource:"Harvested"':
-            fq.remove(item)
-            harvestedFQRemoved = True
-    if harvestedFQRemoved is True:
-        print('Function does not support returning only harvested datasets. Removing metadataSource:"Harvested" from fq params.')
+    # # If there's a metadataSource param in the paramString to return only harvested datasets remove it
+    # harvestedFQRemoved = False
+    # for item in fq[:]:   # Tterate over a shallow copy
+    #     if item == 'metadataSource:"Harvested"':
+    #         fq.remove(item)
+    #         harvestedFQRemoved = True
+    # if harvestedFQRemoved is True:
+    #     print('Function does not support returning only harvested datasets. Removing metadataSource:"Harvested" from fq params.')
 
     # If there are type param values in typeParamList, add them as values to new "type" param
     if typeParamList:
@@ -1194,7 +1194,6 @@ def get_datasets_from_collection_or_search_url(
     baseUrl = requestsGetProperties['baseUrl']
     params = requestsGetProperties['params']
 
-    print(requestsGetProperties)
     datasetInfoDF = get_object_dataframe_from_search_api(
         baseUrl=baseUrl, params=params, headers=headers, objectType='dataset', metadataFieldsList=metadataFieldsList,
         printProgress=False, rootWindow=rootWindow, progressText=progressText, 
