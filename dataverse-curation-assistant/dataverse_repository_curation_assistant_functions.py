@@ -1296,9 +1296,9 @@ def get_datasets_from_collection_or_search_url(
 
             # Create and place result text with uniqueDatasetCount
             if deaccessionedDatasetCount == 0:
-                text = f'Dataset versions found: {str(uniqueDatasetCount)}'
+                text = f'Datasets found: {str(uniqueDatasetCount)}'
             if deaccessionedDatasetCount > 0:
-                text = f'Dataset versions found: {str(uniqueDatasetCount)}\rDeaccessioned datasets ignored: {str(deaccessionedDatasetCount)}'
+                text = f'Datasets found: {str(uniqueDatasetCount)}\rDeaccessioned datasets ignored: {str(deaccessionedDatasetCount)}'
 
             if progressText is not None:
                 progressText.set(text)
