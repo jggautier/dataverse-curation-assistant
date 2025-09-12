@@ -708,11 +708,8 @@ def get_params(apiSearchURL, metadataFieldsList=None):
 
         # Add query to params dict
         if paramValue.startswith('q='):
-            # paramValue = convert_utf8bytes_to_characters(paramValue)
-            # paramValue = convert_str_to_html_encoding(paramValue)
-            # paramValue = paramValue.replace('+', ' ')
-
-            paramValue = urllib.parse.unquote(paramValue)
+            paramValue = convert_utf8bytes_to_characters(paramValue)
+            paramValue = paramValue.replace('+', ' ') # Search API wants spaces, not +
 
             params['params']['q'] = paramValue.replace('q=', '')
 
@@ -727,21 +724,35 @@ def get_params(apiSearchURL, metadataFieldsList=None):
             valueString = paramValue.split('=')[1]
             typeParamList.append(valueString)
 
-        # Add fq queries to fq dict if paramValue.startswith('='):
+        # If the paramvalue starts with =, it's a fq param. Add to fq list
         if paramValue.startswith('='):
             key = paramValue.replace('=', '').split(':')[0]
             value = paramValue.split(':')[1]
 
             # value = convert_utf8bytes_to_characters(value)
             # value = convert_str_to_html_encoding(value)
-            # value = value.replace('+', ' ')
+
+            value = value.replace('+', ' ') # Search API wants spaces, not +
 
             value = urllib.parse.unquote(value)
             
             paramString = key + ':' + value
             fq.append(paramString)
 
-    # If there are type param values in typeParamList, add as value to new "type" param
+    # If there's no metadataSource param in the paramString, add one to exclude harvested datasets
+    if not any('metadataSource' in i for i in fq):
+        fq.append('-metadataSource:"Harvested"')
+
+    # If there's a metadataSource param in the paramString to return only harvested datasets remove it
+    harvestedFQRemoved = False
+    for item in fq[:]:   # Tterate over a shallow copy
+        if item == 'metadataSource:"Harvested"':
+            fq.remove(item)
+            harvestedFQRemoved = True
+    if harvestedFQRemoved is True:
+        print('Function does not support returning only harvested datasets. Removing metadataSource:"Harvested" from fq params.')
+
+    # If there are type param values in typeParamList, add them as values to new "type" param
     if typeParamList:
         params['params']['type'] = typeParamList
 
