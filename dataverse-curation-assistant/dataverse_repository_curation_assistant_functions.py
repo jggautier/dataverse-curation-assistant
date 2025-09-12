@@ -901,6 +901,7 @@ def get_object_dictionary_from_search_api_page(
         verify=False
     )
     data = response.json()
+    # print(response.url)
 
     if metadataFieldsList is not None:
         for item in data['data']['items']:
@@ -975,6 +976,7 @@ def get_object_dataframe_from_search_api(
 
     elif data['status'] == 'OK':
         totalDatasetCount = data['data']['total_count']
+        # print(f'totalDatasetCount: {totalDatasetCount}')
         text = 'Looking for datasets...'
 
         if None not in [rootWindow, progressText, progressLabel]:
@@ -985,7 +987,7 @@ def get_object_dataframe_from_search_api(
         
         # Create start variables to paginate through Search API results
         startInfo = get_search_api_start_list(totalDatasetCount)
-        startsListCount = startInfo['startsListCount']
+        # startsListCount = startInfo['startsListCount']
         startsList = startInfo['startsList']
 
         # misindexedObjectCount = 0
