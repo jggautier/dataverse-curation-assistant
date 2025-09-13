@@ -1000,10 +1000,8 @@ def get_object_dataframe_from_search_api(
         
         # Create start variables to paginate through Search API results
         startInfo = get_search_api_start_list(totalDatasetCount)
-        # startsListCount = startInfo['startsListCount']
         startsList = startInfo['startsList']
 
-        # misindexedObjectCount = 0
         objectInfoDict = []
 
         if None not in [rootWindow, progressText, progressLabel]:
