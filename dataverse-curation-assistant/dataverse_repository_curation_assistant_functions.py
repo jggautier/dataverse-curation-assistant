@@ -1046,24 +1046,37 @@ def get_all_subcollection_aliases(collectionUrl, headers={}, apiKey=''):
     parentDataverseId = data['data']['id']
 
     # Create list and add ID of given dataverse
+    print('Getting all subcollection ids...')
     dataverseIds = [parentDataverseId]
 
-    # Get each subdataverse in the given dataverse
-    for dataverseId in dataverseIds:
-        dataverseGetContentsEndpoint = f'{installationUrl}/api/dataverses/{dataverseId}/contents'
-        response = requests.get(
-            dataverseGetContentsEndpoint,
-            headers=headers)
-        data = response.json()
+    with tqdm(total=len(dataverseIds), bar_format=tqdm_bar_format) as pbar:
+        for dataverseId in dataverseIds:
+            pbar.update(1)
+            pbar.set_postfix_str(f'Collection id: {dataverseId}')
+            
+            dataverseGetContentsEndpoint = f'{installationUrl}/api/dataverses/{dataverseId}/contents'
+            response = requests.get(
+                dataverseGetContentsEndpoint,
+                headers=headers)
+            data = response.json()
 
-        for item in data['data']:
-            if item['type'] == 'dataverse':
-                dataverseId = item['id']
-                dataverseIds.extend([dataverseId])
+            for item in data['data']:
+                if item['type'] == 'dataverse':
+                    dataverseId = item['id']
+                    dataverseIds.extend([dataverseId])
+            
+            
+            pbar.total = len(dataverseIds)
+            pbar.refresh()
+            sleep(1)
 
     # Get the alias for each dataverse ID
+    print('Getting aliases for each collection id...')
     dataverseAliases = []
-    for dataverseId in dataverseIds:
+    loopObj = tqdm(bar_format=tqdm_bar_format, iterable=dataverseIds)
+    for dataverseId in loopObj:
+        loopObj.set_postfix_str(f'Collection id: {dataverseId}')
+
         dataverseInfoEndpoint = f'{installationUrl}/api/dataverses/{dataverseId}'
         response = requests.get(
             dataverseInfoEndpoint,
@@ -1071,6 +1084,7 @@ def get_all_subcollection_aliases(collectionUrl, headers={}, apiKey=''):
         data = response.json()
         alias = data['data']['alias']
         dataverseAliases.append(alias)
+        sleep(1)
 
     return dataverseAliases
 
@@ -1179,6 +1193,7 @@ def get_url_form_of_pid(canonicalPid, installationUrl):
         elif installationUrl is None:
             pidUrlForm = canonicalPid
     return pidUrlForm
+
 
 def get_datasets_from_collection_or_search_url(
     url, headers={}, rootWindow=None, progressLabel=None, progressText=None, textBoxCollectionDatasetPIDs=None, 
@@ -2512,7 +2527,8 @@ def unlock_datasets(
 
 
 def get_monthly_counts(installationUrl, objects, directoryPath):
-    # Create CSV file and add headerrow
+    # objects: dataverses (Dataverse collections), datasets, files, downloads or accounts
+    
     fileName = f'monthly_{objects}_count.csv'
     csvFilePath = f'{directoryPath}/{fileName}'
     with open(csvFilePath, mode='w', newline='') as f:
@@ -2533,20 +2549,6 @@ def get_monthly_counts(installationUrl, objects, directoryPath):
             countList = list(cr)
             for row in countList[1:]:
                 writer.writerow(row)
-
-
-# def get_citation_count(datasetPid):
-#     pidForDatacite = datasetPid.replace('doi:', '')
-#     dataciteEventsAPI = f'https://api.datacite.org/dois/{pidForDatacite}'
-#     try:
-#         response = requests.get(dataciteEventsAPI)
-#         citationCount = response.json()['data']['attributes']['citationCount']
-#     except Exception:
-#         try:
-#             citationCount = response.json()['errors'][0]['title']
-#         except Exception as e:
-#             citationCount = e
-#     return citationCount
 
 
 def get_mdc_metrics(datasetPid, headers):
