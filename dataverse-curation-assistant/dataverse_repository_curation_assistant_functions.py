@@ -2524,6 +2524,19 @@ def unlock_datasets(
             rootWindow.update_idletasks()
 
 
+def get_dataset_download_counts(installationUrl, datasetPid, includeMDC=False):
+    datasetDownloadCountApiUrl = f'{installationUrl}/api/datasets/:persistentId/download/count'
+    params = {
+        'persistentId': datasetPid,
+        'includeMDC': includeMDC}
+    try:
+        response = requests.get(datasetDownloadCountApiUrl, params=params)
+        countDict = response.json()
+    except Exception as e:
+        countDict = f'Error: {e}'
+    return countDict
+
+
 def get_monthly_counts(installationUrl, objects, directoryPath):
     # objects: dataverses (Dataverse collections), datasets, files, downloads or accounts
     
