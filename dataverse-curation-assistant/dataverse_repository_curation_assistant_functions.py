@@ -2524,14 +2524,19 @@ def unlock_datasets(
             rootWindow.update_idletasks()
 
 
-def get_dataset_download_counts(installationUrl, datasetPid, includeMDC=False):
+def get_dataset_classic_download_counts(installationUrl, datasetPid, headers={}):
+    countDict = {"datasetPid": datasetPid}
     datasetDownloadCountApiUrl = f'{installationUrl}/api/datasets/:persistentId/download/count'
     params = {
         'persistentId': datasetPid,
-        'includeMDC': includeMDC}
+        'includeMDC': False}
     try:
-        response = requests.get(datasetDownloadCountApiUrl, params=params)
-        countDict = response.json()
+        response = requests.get(
+            datasetDownloadCountApiUrl, 
+            params=params,
+            headers=headers)
+        responseDict = response.json()        
+        countDict['classicDownloadCount'] = responseDict['downloadCount']
     except Exception as e:
         countDict = f'Error: {e}'
     return countDict
