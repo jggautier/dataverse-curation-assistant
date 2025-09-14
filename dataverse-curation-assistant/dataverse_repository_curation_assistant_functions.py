@@ -2532,7 +2532,7 @@ def get_dataset_classic_download_counts(installationUrl, datasetPid, headers={})
         'includeMDC': False}
     try:
         response = requests.get(
-            datasetDownloadCountApiUrl, 
+            datasetDownloadCountApiUrl,
             params=params,
             headers=headers)
         responseDict = response.json()        
