@@ -77,6 +77,43 @@ class collapsiblePanel(Frame):
             self.toggleButton.configure(text='▲')
 
 
+def forget_widget(widget):
+    exists = widget.winfo_exists()
+    if exists == 1:
+        widget.grid_forget()
+    else:
+        pass
+
+
+def select_all(listbox):
+    listbox.select_set(0, END)
+
+
+def clear_selections(listbox):
+    listbox.selection_clear(0, END)
+
+
+def get_listbox_values(listbox):
+    selectedFields = []
+    selections = listbox.curselection()
+    for selection in selections:
+        fieldName = listbox.get(selection).strip().split(':')[0]
+        selectedFields.append(fieldName)
+    return selectedFields
+
+
+def get_directory_path():
+    directoryPath = filedialog.askdirectory()
+    return directoryPath
+
+
+def get_file_path(fileTypes):
+    if 'yaml' in fileTypes:
+        filePath = filedialog.askopenfilename(
+            filetypes=[('YAML','*.yaml'), ('YAML', '*.yml')])
+    return filePath
+
+
 # Context manager to patch joblib to report into tqdm progress bar given as argument
 @contextlib.contextmanager
 def tqdm_joblib(tqdm_object):
@@ -114,14 +151,6 @@ def import_credentials(filePath, installationURLField=None, apiKeyField=None, fo
 
     elif forCurationApp is False:
         return credentialsDict
-
-
-def forget_widget(widget):
-    exists = widget.winfo_exists()
-    if exists == 1:
-        widget.grid_forget()
-    else:
-        pass
 
 
 # Function for getting value of nested key or returning nothing if nested key
@@ -223,18 +252,6 @@ def divide_chunks(l, n):
         listOfLists.append(l[i:i + n])
     return listOfLists
 
-def get_directory_path():
-    directoryPath = filedialog.askdirectory()
-    return directoryPath
-
-
-def get_file_path(fileTypes):
-    if 'yaml' in fileTypes:
-        filePath = filedialog.askopenfilename(
-            filetypes=[('YAML','*.yaml'), ('YAML', '*.yml')])
-    return filePath
-
-
 # Function for getting list of non-hidden directories inside of a given directory
 def list_files_nonhidden(path):
     files = []
@@ -273,14 +290,6 @@ def zip_anything(path, zipPath):
         else:
             arcname = os.path.basename(path)
             zipf.write(path, arcname)
-
-
-def select_all(listbox):
-    listbox.select_set(0, END)
-
-
-def clear_selections(listbox):
-    listbox.selection_clear(0, END)
 
 
 def check_installation_url_status(string, requestTimeout=20, headers={}):
@@ -347,12 +356,8 @@ def check_api_endpoint(url, headers, verify=False, jsonResponseExpected=True):
 
         retryAfter = response.headers.get("Retry-After")
         responseStatusCode = response.status_code
-        responseText = response.text
-        # print(f'retryAfter: {retryAfter}')
-        # print(f'responseStatusCode: {responseStatusCode}')
-        # print(responseText)
-        
-        # if responseStatusCode == 200:
+        responseText = response.text       
+
         if responseStatusCode in [200, 202]:
             status = 'OK'
             if jsonResponseExpected is True:
@@ -366,7 +371,6 @@ def check_api_endpoint(url, headers, verify=False, jsonResponseExpected=True):
             elif jsonResponseExpected is False:
                 status = responseStatusCode
 
-        # elif responseStatusCode != 200:
         elif responseStatusCode not in [200, 202]:
             if jsonResponseExpected is True:
                 try:
@@ -899,6 +903,7 @@ def get_value_row_from_search_api_object(item, installationUrl, metadataFieldsLi
 def get_object_dictionary_from_search_api_page(
     installationUrl, headers, params, start, 
     objectInfoDict, metadataFieldsList=None):
+
     searchApiUrl = f'{installationUrl}/api/search'
     params['start'] = start
     params['per_page'] = 10
@@ -914,7 +919,6 @@ def get_object_dictionary_from_search_api_page(
         verify=False
     )
     data = response.json()
-    # print(response.url)
 
     if metadataFieldsList is not None:
         for item in data['data']['items']:
@@ -1062,8 +1066,7 @@ def get_all_subcollection_aliases(collectionUrl, headers={}, apiKey=''):
                 if item['type'] == 'dataverse':
                     dataverseId = item['id']
                     dataverseIds.extend([dataverseId])
-            
-            
+
             pbar.total = len(dataverseIds)
             pbar.refresh()
             sleep(1)
@@ -1321,123 +1324,6 @@ def get_datasets_from_collection_or_search_url(
                 print(text)
 
             return datasetInfoDF
-
-
-def get_int_from_size_message(sizeEndpointJson):
-    message = sizeEndpointJson['data']['message']
-
-    if 'dataverse' in message:
-        byteSizeString = (message
-                          .lstrip('Total size of the files stored in this dataverse:')
-                          .rstrip(' bytes'))
-        byteSizeInt = int(byteSizeString.replace(',', ''))
-
-    elif 'dataset' in message:
-        byteSizeString = message.lstrip('Total size of the files stored in this dataset: ').rstrip(' bytes')
-        byteSizeInt = int(byteSizeString.replace(',', ''))
-
-    return byteSizeInt
-
-
-# Get byte size of files in dataset
-def get_dataset_size(installationUrl, datasetIdOrPid, onlyPublishedFiles=False, apiKey=''):
-
-    if onlyPublishedFiles == False:
-        if apiKey=='':
-            print('API key required to get sizes of all dataset versions')
-            exit()
-
-        if isinstance(datasetIdOrPid, str):
-            datasetSizeEndpointUrl = f'{installationUrl}/api/datasets/:persistentId/storagesize?persistentId={datasetIdOrPid}'
-        elif isinstance(datasetIdOrPid, int):
-            datasetSizeEndpointUrl = f'{installationUrl}/api/datasets/{datasetIdOrPid}/storagesize'
-        response = requests.get(
-            datasetSizeEndpointUrl, headers={'X-Dataverse-key': apiKey})
-        byteSizeTotalInt = get_int_from_size_message(sizeEndpointJson=response.json())
-
-    elif onlyPublishedFiles == True:
-        # if installationUrl == 'https://dataverse.harvard.edu':
-        #     print('Can\'t get sizes of only published datasets in Harvard Dataverse.')
-        #     print('See https://github.com/IQSS/dataverse.harvard.edu/issues/373')
-        #     sys.exit()
-
-        if isinstance(datasetIdOrPid, int):
-            print('datasetIdOrPid must be a PID')
-            sys.exit()
-
-        # Get metadata of all published versions (since apiKey is not used here)
-        allVersionMetadata = get_dataset_metadata_export(
-            installationUrl, datasetPid=datasetIdOrPid, exportFormat='dataverse_json', 
-            timeout=60, verify=False, excludeFiles=False, returnOwners=False,
-            version='all', headers={}, apiKey='')
-
-        # Get sum of sizes of all unique files in all published dataset versions
-        byteSizeTotalInt = 0
-        fileIdList = []
-
-        for version in allVersionMetadata['data']:
-            if len(version['files']) == 0:
-                byteSizeInt = 0
-            elif len(version['files']) > 0:
-                for file in version['files']:
-                    fileId = file['dataFile']['id']
-                    if fileId not in fileIdList:
-                        fileIdList.append(fileId)
-                        byteSizeInt = file['dataFile']['filesize']
-                        originalFileSize = improved_get(file, 'dataFile.originalFileSize', 0)
-                        byteSizeTotalInt = byteSizeTotalInt + byteSizeInt + originalFileSize
-        
-    byteSizeTotalPretty = format_size(byteSizeTotalInt)
-    sizeFormats = {
-        'byteSizeTotalInt': byteSizeTotalInt,
-        'byteSizeTotalPretty': byteSizeTotalPretty
-    }
-
-    return sizeFormats
-
-# Get byte size of files in collection
-def get_collection_size(installationUrl, apiKey, collectionIdOrAlias, includeSubCollections=True):
-
-    if includeSubCollections is True:
-        collectionSizeEndpointUrl = f'{installationUrl}/api/dataverses/{collectionIdOrAlias}/storagesize'
-
-        response = requests.get(
-            collectionSizeEndpointUrl, headers={'X-Dataverse-key': apiKey})
-        byteSizeInt = get_int_from_size_message(sizeEndpointJson=response.json())
-        byteSizePretty = format_size(byteSizeInt)
-
-    # If we don't want to include sizes of files in collection's subcollections...
-    elif includeSubCollections is False:
-        # Use Get Contents API endpoint to get a list of PIDs of datasets published in the given collection
-        datasetPids = []
-        dataverseGetContentsEndpoint = f'{installationUrl}/api/dataverses/{collectionIdOrAlias}/contents'
-        response = requests.get(
-            dataverseGetContentsEndpoint,
-            headers={'X-Dataverse-key': apiKey})
-        data = response.json()
-
-        for content in data['data']:
-            if content['type'] == 'dataset':
-                datasetPid = get_canonical_pid(content['persistentUrl'])
-                datasetPids.append(datasetPid)
-
-        # Get the sum of byte sizes of all datasets in datasetPids list
-        datasetsSizeSum = 0
-
-        for datasetPid in datasetPids:
-            datasetSizeInt = get_dataset_size(installationUrl, datasetIdOrPid=datasetPid, apiKey=apiKey)['byteSizeTotalInt']
-            datasetsSizeSum = datasetsSizeSum + datasetSizeInt
-
-        byteSizeInt = datasetsSizeSum
-        byteSizePretty = format_size(byteSizeInt)
-
-    # Create dictionary that includes byte size as an int and a human readable string, e.g. 4MB
-    sizeFormats = {
-        'byteSizeInt': byteSizeInt,
-        'byteSizePretty': byteSizePretty
-    }
-
-    return sizeFormats
 
 
 def get_dataset_metadata_export(
@@ -1789,14 +1675,6 @@ def get_parent_field_names(metadatablockData, listbox=None):
             listbox.insert('end', option)
 
     return(allFieldsDBNamesDict)
-
-def get_listbox_values(listbox):
-    selectedFields = []
-    selections = listbox.curselection()
-    for selection in selections:
-        fieldName = listbox.get(selection).strip().split(':')[0]
-        selectedFields.append(fieldName)
-    return selectedFields
 
 
 # Get the child field database names of compound fields or the database name of primitive fields
@@ -2522,6 +2400,124 @@ def unlock_datasets(
             notUnlockedMessage = f'Datasets not unlocked: {len(notUnlockedDatasets)}'
             notUnlockedText.set(notUnlockedMessage)
             rootWindow.update_idletasks()
+
+
+def get_int_from_size_message(sizeEndpointJson):
+    message = sizeEndpointJson['data']['message']
+
+    if 'dataverse' in message:
+        byteSizeString = (message
+                          .lstrip('Total size of the files stored in this dataverse:')
+                          .rstrip(' bytes'))
+        byteSizeInt = int(byteSizeString.replace(',', ''))
+
+    elif 'dataset' in message:
+        byteSizeString = message.lstrip('Total size of the files stored in this dataset: ').rstrip(' bytes')
+        byteSizeInt = int(byteSizeString.replace(',', ''))
+
+    return byteSizeInt
+
+
+# Get byte size of files in dataset
+def get_dataset_size(installationUrl, datasetIdOrPid, onlyPublishedFiles=False, apiKey=''):
+
+    if onlyPublishedFiles == False:
+        if apiKey=='':
+            print('API key required to get sizes of all dataset versions')
+            exit()
+
+        if isinstance(datasetIdOrPid, str):
+            datasetSizeEndpointUrl = f'{installationUrl}/api/datasets/:persistentId/storagesize?persistentId={datasetIdOrPid}'
+        elif isinstance(datasetIdOrPid, int):
+            datasetSizeEndpointUrl = f'{installationUrl}/api/datasets/{datasetIdOrPid}/storagesize'
+        response = requests.get(
+            datasetSizeEndpointUrl, headers={'X-Dataverse-key': apiKey})
+        byteSizeTotalInt = get_int_from_size_message(sizeEndpointJson=response.json())
+
+    elif onlyPublishedFiles == True:
+        # if installationUrl == 'https://dataverse.harvard.edu':
+        #     print('Can\'t get sizes of only published datasets in Harvard Dataverse.')
+        #     print('See https://github.com/IQSS/dataverse.harvard.edu/issues/373')
+        #     sys.exit()
+
+        if isinstance(datasetIdOrPid, int):
+            print('datasetIdOrPid must be a PID')
+            sys.exit()
+
+        # Get metadata of all published versions (since apiKey is not used here)
+        allVersionMetadata = get_dataset_metadata_export(
+            installationUrl, datasetPid=datasetIdOrPid, exportFormat='dataverse_json', 
+            timeout=60, verify=False, excludeFiles=False, returnOwners=False,
+            version='all', headers={}, apiKey='')
+
+        # Get sum of sizes of all unique files in all published dataset versions
+        byteSizeTotalInt = 0
+        fileIdList = []
+
+        for version in allVersionMetadata['data']:
+            if len(version['files']) == 0:
+                byteSizeInt = 0
+            elif len(version['files']) > 0:
+                for file in version['files']:
+                    fileId = file['dataFile']['id']
+                    if fileId not in fileIdList:
+                        fileIdList.append(fileId)
+                        byteSizeInt = file['dataFile']['filesize']
+                        originalFileSize = improved_get(file, 'dataFile.originalFileSize', 0)
+                        byteSizeTotalInt = byteSizeTotalInt + byteSizeInt + originalFileSize
+        
+    byteSizeTotalPretty = format_size(byteSizeTotalInt)
+    sizeFormats = {
+        'byteSizeTotalInt': byteSizeTotalInt,
+        'byteSizeTotalPretty': byteSizeTotalPretty
+    }
+
+    return sizeFormats
+
+
+# Get byte size of files in collection
+def get_collection_size(installationUrl, apiKey, collectionIdOrAlias, includeSubCollections=True):
+
+    if includeSubCollections is True:
+        collectionSizeEndpointUrl = f'{installationUrl}/api/dataverses/{collectionIdOrAlias}/storagesize'
+
+        response = requests.get(
+            collectionSizeEndpointUrl, headers={'X-Dataverse-key': apiKey})
+        byteSizeInt = get_int_from_size_message(sizeEndpointJson=response.json())
+        byteSizePretty = format_size(byteSizeInt)
+
+    # If we don't want to include sizes of files in collection's subcollections...
+    elif includeSubCollections is False:
+        # Use Get Contents API endpoint to get a list of PIDs of datasets published in the given collection
+        datasetPids = []
+        dataverseGetContentsEndpoint = f'{installationUrl}/api/dataverses/{collectionIdOrAlias}/contents'
+        response = requests.get(
+            dataverseGetContentsEndpoint,
+            headers={'X-Dataverse-key': apiKey})
+        data = response.json()
+
+        for content in data['data']:
+            if content['type'] == 'dataset':
+                datasetPid = get_canonical_pid(content['persistentUrl'])
+                datasetPids.append(datasetPid)
+
+        # Get the sum of byte sizes of all datasets in datasetPids list
+        datasetsSizeSum = 0
+
+        for datasetPid in datasetPids:
+            datasetSizeInt = get_dataset_size(installationUrl, datasetIdOrPid=datasetPid, apiKey=apiKey)['byteSizeTotalInt']
+            datasetsSizeSum = datasetsSizeSum + datasetSizeInt
+
+        byteSizeInt = datasetsSizeSum
+        byteSizePretty = format_size(byteSizeInt)
+
+    # Create dictionary that includes byte size as an int and a human readable string, e.g. 4MB
+    sizeFormats = {
+        'byteSizeInt': byteSizeInt,
+        'byteSizePretty': byteSizePretty
+    }
+
+    return sizeFormats
 
 
 def get_dataset_classic_download_counts(installationUrl, datasetPid, headers={}):
@@ -3443,7 +3439,7 @@ def get_dataverse_collection_categories(installationUrl, collectionAliasList, ap
     return collectionCategoriesDict
 
 
-def update_dataverse_collection(installation, collectionAlias, metadata, apiKey):
+def update_dataverse_collection(installationUrl, collectionAlias, metadata, apiKey):
     # e.g. metadata = {"dataverseType": "JOURNALS"}
     # See dataverse-complete.json at https://guides.dataverse.org/en/6.4/api/native-api.html#create-a-dataverse-collection
     
