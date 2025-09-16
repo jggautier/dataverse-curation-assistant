@@ -1314,9 +1314,9 @@ def get_datasets_from_collection_or_search_url(
 
             # Create and place result text with uniqueDatasetCount
             if deaccessionedDatasetCount == 0:
-                text = f'Datasets found: {str(uniqueDatasetCount)}'
+                text = f'Datasets found: {(len(pd.unique(datasetInfoDF["dataset_pid"])))}'
             if deaccessionedDatasetCount > 0:
-                text = f'Datasets found: {str(uniqueDatasetCount)}\rDeaccessioned datasets ignored: {str(deaccessionedDatasetCount)}'
+                text = f'Datasets found: {(len(pd.unique(datasetInfoDF["dataset_pid"])))}\rDeaccessioned datasets ignored: {str(deaccessionedDatasetCount)}'
 
             if progressText is not None:
                 progressText.set(text)
@@ -1373,6 +1373,10 @@ def get_dataset_metadata_export(
                 data = f'ERROR: {e}'
 
         elif version == 'all':
+
+            params['limit'] = 10
+            offset = 0
+            params['offset'] = offset
             try:
                 response = requests.get(
                     dataGetAllVersionsUrl,
@@ -1381,10 +1385,40 @@ def get_dataset_metadata_export(
                     timeout=timeout, 
                     verify=verify)
 
-                if response.status_code in [200, 202] and 'metadataBlocks' in response.json()['data'][0]:
-                    data = response.json()
+                if (
+                    response.status_code in [200, 202] and 
+                    len(response.json()['data']) > 0 and 
+                    'metadataBlocks' in response.json()['data'][0]):
+
+                    data = {
+                        'status':'OK',
+                        'data':[]
+                    }
+                    data['data'].extend(response.json()['data'])
+                    countOfVersions = len(data['data'])
+                    lastVersionMetadata = data['data'][-1]
+                    lastVersionMajorNumber = lastVersionMetadata['versionNumber']
+                    lastVersionMinorNumber = lastVersionMetadata['versionMinorNumber']
+                    lastVersionNumber = f'{lastVersionMajorNumber}.{lastVersionMinorNumber}'
+
+                    while countOfVersions == 10 and lastVersionNumber != '1.0':
+                        offset = offset + 10
+                        params['offset'] = offset
+                        response = requests.get(
+                            dataGetAllVersionsUrl,
+                            params=params,
+                            headers=headers,
+                            timeout=30, 
+                            verify=False)
+                        countOfVersions = len(data['data'])
+                        lastVersionMetadata = data['data'][-1]
+                        lastVersionMajorNumber = lastVersionMetadata['versionNumber']
+                        lastVersionMinorNumber = lastVersionMetadata['versionMinorNumber']
+                        lastVersionNumber = f'{lastVersionMajorNumber}.{lastVersionMinorNumber}'
+                        data['data'].extend(response.json()['data'])
+
                 else:
-                    data = f'ERROR: {response.status_code}'
+                    data = f'ERROR: {response.status_code}, {response.json()["data"]}'
             except Exception as e:
                 data = f'ERROR: {e}'
 
