@@ -857,7 +857,6 @@ def get_value_row_from_search_api_object(item, installationUrl, metadataFieldsLi
     elif metadataFieldsList is None:
 
         if item['type'] == 'dataset':
-
             versionState = item['versionState']
             if versionState == 'DRAFT':
                 latestVersionNumber = 'DRAFT'
@@ -928,8 +927,9 @@ def get_object_dictionary_from_search_api_page(
 
     elif metadataFieldsList is None:
         for item in data['data']['items']:
-            newRow = get_value_row_from_search_api_object(item, installationUrl)
-            objectInfoDict.append(dict(newRow))
+            if (item['type'] == 'dataset' and 'versionState' in item) or item['type'] != 'dataset':
+                newRow = get_value_row_from_search_api_object(item, installationUrl)
+                objectInfoDict.append(dict(newRow))
 
     sleep(1)
 
@@ -1397,8 +1397,8 @@ def get_dataset_metadata_export(
                     data['data'].extend(response.json()['data'])
                     countOfVersions = len(data['data'])
                     lastVersionMetadata = data['data'][-1]
-                    lastVersionMajorNumber = lastVersionMetadata['versionNumber']
-                    lastVersionMinorNumber = lastVersionMetadata['versionMinorNumber']
+                    lastVersionMajorNumber = improved_get(lastVersionMetadata, 'versionNumber')
+                    lastVersionMinorNumber = improved_get(lastVersionMetadata, 'versionMinorNumber')
                     lastVersionNumber = f'{lastVersionMajorNumber}.{lastVersionMinorNumber}'
 
                     while countOfVersions == 10 and lastVersionNumber != '1.0':
