@@ -1279,7 +1279,7 @@ def get_datasets_from_collection_or_search_url(
                     dataverseAliases = get_all_subcollection_aliases(url, apiKey=apiKey)
 
                     # Remove any datasets that aren't owned by any of the 
-                    # subdataverses. This will exclude linked datasets
+                    # subdataverses. This will remove datasets linked into the collections
                     datasetInfoDF = datasetInfoDF[
                         datasetInfoDF['dataverse_collection_alias'].isin(dataverseAliases)]
 
