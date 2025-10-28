@@ -1,3 +1,6 @@
+## Status
+[![Project Status: Abandoned – Initial development has started, but there has not yet been a stable, usable release; the project has been abandoned and the author(s) do not intend on continuing development.](https://www.repostatus.org/badges/latest/abandoned.svg)](https://www.repostatus.org/#abandoned)
+
 # Dataverse repository curation assistant
 A small software application for automating things in repositories that use the Dataverse software (https://dataverse.org). With this application you can:
 - Get dataset metadata as CSV files
@@ -12,9 +15,6 @@ A small software application for automating things in repositories that use the 
 You can import your credentials from a Dataverse repository by clicking the "Import credentials" button and choosing a YAML file from your computer. The Installation URL and API Token fields will be filled with the URL and token from the selected YAML file. You can download [the sample YAML file](https://github.com/jggautier/dataverse-scripts/blob/main/dataverse_repository_curation_assistant/credentials.yaml) and add your credentials.
 
 The application is written using the [Dataverse software's APIs](https://guides.dataverse.org/en/5.10/api/index.html), Python 3, and Python's [tkinter library](https://docs.python.org/3/library/tkinter.html) (for creating the graphical user interface), and made into an executable file using [pyInstaller](https://pyinstaller.readthedocs.io/).
-
-## Status
-[![Project Status: Abandoned – Initial development has started, but there has not yet been a stable, usable release; the project has been abandoned and the author(s) do not intend on continuing development.](https://www.repostatus.org/badges/latest/abandoned.svg)](https://www.repostatus.org/#abandoned)
 
 
 ## Opening the software application...
