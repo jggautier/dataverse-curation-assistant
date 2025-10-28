@@ -1,6 +1,8 @@
 ## Status
 [![Project Status: Abandoned – Initial development has started, but there has not yet been a stable, usable release; the project has been abandoned and the author(s) do not intend on continuing development.](https://www.repostatus.org/badges/latest/abandoned.svg)](https://www.repostatus.org/#abandoned)
 
+The Dataverse community has continued discussion about providing more support to users who need to analyze metadata published in Dataverse repositories, which was one of the features of this abandoned app. Please see https://github.com/IQSS/dataverse/issues/11892.
+
 # Dataverse repository curation assistant
 A small software application for automating things in repositories that use the Dataverse software (https://dataverse.org). With this application you can:
 - Get dataset metadata as CSV files
